@@ -8,3 +8,5 @@ Compile <code>jac -class pircbot.java:. DonutDan.java</code>
 
 Once the bot has joined a channel use the command <code>donutdan signup</code> to enter the raffle. Anyone who has the password
 can end the raffle via the command <code>donutdan endraffle password</code>
+
+If you need SSL, use <a href=http://www.brudvik.org/projects/development/pircbot-with-ssl/>this</a> version of pircbot, and follow the instructions for changing how to connect to a channel that are found there
