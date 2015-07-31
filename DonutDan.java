@@ -4,28 +4,30 @@ import java.util.Random;
 
 public class DonutDan extends PircBot {
 
-  private ArrayList<String> rafflers = null;
+  private ArrayList<String> allEntrants = null;
+  private ArrayList<String> entrantsWhoHaveNotWon = null;
   private boolean isOver = false;
   private int numPrizes;
   private String channel;
-  private String password;
+  private String admin;
 
-  public DonutDan(int numPrizes, String password) {
+  public DonutDan(int numPrizes, String admin) {
     this.setName("DonutDan");
     this.numPrizes = numPrizes;
-    this.password = password;
-    this.rafflers = new ArrayList<>();
+    this.admin = admin;
+    this.entrantsWhoHaveNotWon = new ArrayList<>();
+    this.allEntrants = new ArrayList<>();
   }
 
   public static void main(String[] args) throws Exception {
     if (args.length != 2) {
-      System.out.println("Needs number of prizes and password");
+      System.out.println("Needs number of prizes and admin user name");
       return;
     }
 
     DonutDan bot = new DonutDan(Integer.parseInt(args[0]), args[1]);
-    bot.connect("myirc.com", port#, new TrustingSSLSocketFactory());
-    bot.joinChannel("#channelname");
+    bot.connect("myirc", myport, new TrustingSSLSocketFactory());
+    bot.joinChannel("mychannel");
     bot.setupChannel();
   }
 
@@ -39,55 +41,107 @@ public class DonutDan extends PircBot {
     String time = new java.util.Date().toString();
     sendMessage(this.channel, this.numPrizes  + " donut(s) are being given away today!");
     sendMessage(this.channel, "Enter now with command \"!donut\"");
+    sendMessage(this.admin, "Give a single donut with command \"!giveDonut\" or end the raffle and give out the rest with command \"!endRaffle\"");
   }
 
   public void onMessage(String channel, String sender,
                        String login, String hostname, String message) {
     if (message.equalsIgnoreCase("!donut")) {
       this.signUp(sender);
-    } else if (message.equalsIgnoreCase("DonutDan endraffle " + this.password)) {
-      this.isOver = true;
-
-      this.pickWinners();
-      String time = new java.util.Date().toString();
-      sendMessage(this.channel, "Today's donut raffle ended at " + time);
+    }
+    else if (message.equalsIgnoreCase("!donutsLeft")) {
+      sendMessage(this.channel, "There are " + this.numPrizes + " donut(s) left");
+    }
+    else if (message.equalsIgnoreCase("!giveDonut")) {
+      if (sender.equals(this.admin)) {
+        this.pickWinner();
+      } else {
+        this.sendAntiCheatMessage(sender);
+      }
+    }
+    else if (message.equalsIgnoreCase("!endRaffle")) {
+      if (sender.equals(this.admin)) {
+        this.pickWinners();
+      } else {
+        this.sendAntiCheatMessage(sender);
+      }
     }
   }
 
   private void signUp(String sender) {
-    if (!this.isOver && !this.rafflers.contains(sender)) {
-      this.rafflers.add(sender);
-      sendMessage(this.channel, sender + ": You have entered the donut raffle!");
+    if (this.isOver || this.allEntrants.contains(sender)) {
+      sendAntiCheatMessage(sender);
     } else {
-      sendMessage(this.channel, sender + ": You ain't slick 8-)");
+      this.allEntrants.add(sender);
+      this.entrantsWhoHaveNotWon.add(sender);
+      sendMessage(this.channel, sender + ": You have entered the donut raffle!");
+    }
+  }
+
+  private void pickWinner() {
+    int size = this.entrantsWhoHaveNotWon.size();
+    if (size == 0) {
+      this.sendMessage(this.channel, "Nobody is currently entered!");
+      return;
+    }
+
+    String winner = this.giveDonutToRandomEntrant();
+    this.sendMessage(this.channel, winner + ": !!! You get a donut " + winner + " !!!");
+
+    if (this.numPrizes == 0) {
+      this.isOver = true;
+      this.sendMessage(this.channel, "That was the last donut y'all, thanks for playing");
+      this.sendRaffleOverMessage();
     }
   }
 
   private void pickWinners() {
-    int size = this.rafflers.size();
+    this.isOver = true;
+
+    int size = this.entrantsWhoHaveNotWon.size();
     String winner;
+    String winners = "";
 
     if (size <= this.numPrizes) {
       for (int i = 0; i < size; i++) {
-        winner = this.rafflers.get(i);
-        this.sendMessage(this.channel, winner + ": !!! You get a donut " + winner + " !!!");
+        winner = this.entrantsWhoHaveNotWon.get(i);
+        this.sendMessage(winner, ": !!! You get a donut " + winner + " !!!");
+        winners += winner + ", ";
       }
+      this.sendMessage(this.channel, "Winners: [ " + winners + "]");
     } else if (size > 0) {
-      int curSize = size;
-      int winnerPos;
-      Random rand = new Random();
-
-      for (int i = 0; i < this.numPrizes; i++) {
-        winnerPos = rand.nextInt(curSize);
-        winner = this.rafflers.get(winnerPos);
-
-        this.sendMessage(this.channel, winner + ": !!! You get a donut " + winner + " !!!");
-
-        rafflers.remove(winnerPos);
-        curSize = rafflers.size();
+      int totalPrizes = this.numPrizes;
+      for (int i = 0; i < totalPrizes; i++) {
+        winner = giveDonutToRandomEntrant();
+        winners += winner + ", ";
       }
+      this.sendMessage(this.channel, "Winners: [ " + winners + "]");
     } else {
       this.sendMessage(this.channel, "Nobody entered the giveaway... :'(");
     }
+
+    this.sendRaffleOverMessage();
+  }
+
+  private String giveDonutToRandomEntrant() {
+    int size = this.entrantsWhoHaveNotWon.size();
+    Random rand = new Random();
+    int winnerPos = rand.nextInt(size);
+
+    String winner = this.entrantsWhoHaveNotWon.get(winnerPos);
+    this.sendMessage(winner, ": !!! You get a donut " + winner + " !!!");
+    entrantsWhoHaveNotWon.remove(winnerPos);
+    this.numPrizes--;
+
+    return winner;
+  }
+
+  private void sendRaffleOverMessage() {
+    String time = new java.util.Date().toString();
+    sendMessage(this.channel, "Today's donut raffle ended at " + time);
+  }
+
+  private void sendAntiCheatMessage(String sender) {
+    sendMessage(this.channel, sender + ": You ain't slick 8-)");
   }
 }
