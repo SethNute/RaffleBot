@@ -24,8 +24,8 @@ public class DonutDan extends PircBot {
     }
 
     DonutDan bot = new DonutDan(Integer.parseInt(args[0]), args[1]);
-    bot.connect("channel", 000);
-    bot.joinChannel("");
+    bot.connect("myirc.com", port#, new TrustingSSLSocketFactory());
+    bot.joinChannel("#channelname");
     bot.setupChannel();
   }
 
@@ -38,12 +38,12 @@ public class DonutDan extends PircBot {
 
     String time = new java.util.Date().toString();
     sendMessage(this.channel, this.numPrizes  + " donut(s) are being given away today!");
-    sendMessage(this.channel, "Enter now with command \"DonutDan signup\"");
+    sendMessage(this.channel, "Enter now with command \"!donut\"");
   }
 
   public void onMessage(String channel, String sender,
                        String login, String hostname, String message) {
-    if (message.equalsIgnoreCase("DonutDan signup")) {
+    if (message.equalsIgnoreCase("!donut")) {
       this.signUp(sender);
     } else if (message.equalsIgnoreCase("DonutDan endraffle " + this.password)) {
       this.isOver = true;
