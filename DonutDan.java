@@ -46,25 +46,37 @@ public class DonutDan extends PircBot {
 
   public void onMessage(String channel, String sender,
                        String login, String hostname, String message) {
-    if (message.equalsIgnoreCase("!donut")) {
+    String word = this.getFirstWord(message);
+    if (word.equalsIgnoreCase("!donut")) {
       this.signUp(sender);
     }
-    else if (message.equalsIgnoreCase("!donutsLeft")) {
+    else if (word.equalsIgnoreCase("!donutsLeft")) {
       sendMessage(this.channel, "There are " + this.numPrizes + " donut(s) left");
     }
-    else if (message.equalsIgnoreCase("!giveDonut")) {
+    else if (word.equalsIgnoreCase("!giveDonut")) {
       if (sender.equals(this.admin)) {
         this.pickWinner();
       } else {
         this.sendAntiCheatMessage(sender);
       }
     }
-    else if (message.equalsIgnoreCase("!endRaffle")) {
+    else if (word.equalsIgnoreCase("!endRaffle")) {
       if (sender.equals(this.admin)) {
         this.pickWinners();
       } else {
         this.sendAntiCheatMessage(sender);
       }
+    }
+    else if (word.equalsIgnoreCase("!getouttahere") && sender.equals(this.admin)) {
+      this.disconnect();
+    }
+  }
+
+  private String getFirstWord(String text) {
+    if (text.indexOf(' ') > -1) {
+      return text.substring(0, text.indexOf(' '));
+    } else {
+      return text;
     }
   }
 
