@@ -2,6 +2,7 @@
 IRC raffle bot that gives away donuts, uses pircbot as base
 
 <strong>To Install and Use</strong>
+
 `git clone`, resulting in the `RaffleBot` dir being created
 
 Download <a href=http://www.brudvik.org/projects/development/pircbot-with-ssl/>this</a> version of pircbot and extract it into your `RaffleBot` dir. If you ls your directory should look like `DonutDan.java LICENSE org README.md`
