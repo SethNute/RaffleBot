@@ -1,12 +1,20 @@
 # RaffleBot
 IRC raffle bot that gives away donuts, uses pircbot as base
 
-To Use:
-Run <code>ja -classpath pircbot.java:. DonutDan (numberOfPrizes) (passwordToEndRaffle)</code>
+<strong>To Install and Use</strong>
+`git clone`, resulting in the `RaffleBot` dir being created
 
-Compile <code>jac -class pircbot.java:. DonutDan.java</code>
+Download <a href=http://www.brudvik.org/projects/development/pircbot-with-ssl/>this</a> version of pircbot and extract it into your `RaffleBot` dir. If you ls your directory should look like `DonutDan.java LICENSE org README.md`
 
-Once the bot has joined a channel use the command <code>donutdan signup</code> to enter the raffle. Anyone who has the password
-can end the raffle via the command <code>donutdan endraffle password</code>
+Open up `DonutDan.java` in whatever editor and fill in lines 29 && 30 with the info of the irc channel you'd like the bot to connect to. Save the file.
 
-If you need SSL, use <a href=http://www.brudvik.org/projects/development/pircbot-with-ssl/>this</a> version of pircbot, and follow the instructions for changing how to connect to a channel that are found there
+Compile using `javac DonutDan.java`
+
+Run using `java DonutDan <Number of donuts to be raffled> <Admin user (the irc name of the guy you wanna be able to give donuts)>`
+
+<strong>Available Commands</strong>
+`!donut` - signs the user up for the raffle
+`!donutsLeft` - outputs how many donuts are yet to be raffled off
+`!giveDonut` - admin only - give the donut to a random person currently entered in the raffle
+`!endRaffle` - admin only - give out the rest of the donuts
+`!getouttahere` - admin only - dismiss the bot from the channel
