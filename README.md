@@ -16,7 +16,11 @@ Run using `java DonutDan <Number of donuts to be raffled> <Admin user (the irc n
 <strong>Available Commands</strong>
 
 `!donut` - signs the user up for the raffle
+
 `!donutsLeft` - outputs how many donuts are yet to be raffled off
+
 `!giveDonut` - admin only - give the donut to a random person currently entered in the raffle
+
 `!endRaffle` - admin only - give out the rest of the donuts
+
 `!getouttahere` - admin only - dismiss the bot from the channel
